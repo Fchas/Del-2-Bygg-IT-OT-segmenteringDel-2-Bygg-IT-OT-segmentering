@@ -1,0 +1,3 @@
+
+ Illegitima vägar — får INTE gå igenom:
+  ✓ OK     attacker (IT) → mock-plc:502 (OT) (expected BLOCK, got BLOCK)
