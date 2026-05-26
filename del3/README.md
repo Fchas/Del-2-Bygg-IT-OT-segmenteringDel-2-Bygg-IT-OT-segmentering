@@ -1,263 +1,113 @@
 # Lab 2 Del 3: Intrusion Detection with Suricata IDS
 
-**Status:** Ready to Start  
+**Status:** Ready to Execute  
 **Date:** May 26, 2026  
 **Checkpoint Deadline:** May 26, 2026  
 **Final Submission:** May 29, 2026
 
-## 📋 Del 3 Overview
+## 📋 Översikt
 
-After building network segmentation in Del 2, we now add **active monitoring and detection**:
-- Deploy Suricata IDS on OT network bridge
-- Monitor for suspicious Modbus commands
-- Create custom detection rules
-- Verify alerts fire on attacks
-- Document detection findings
+Denna mapp innehåller dokumentation och verifieringsmaterial för Del 3.
+Det är viktigt att förstå att den faktiska körbara Del 3-miljön är extern:
 
-## 🎯 What You'll Build
+`~/ais-lab2-sandboxes/del3`
 
-| Component | Purpose | Details |
-|-----------|---------|---------|
-| **Suricata IDS** | Intrusion Detection | Sniffs OT bridge (br-lab3-ot) |
-| **4 Base Rules** | Attack Detection | FC5, FC6, FC16, TCP SYN |
-| **2 Custom Rules** | Enhanced Detection | FC8 Diagnostics + Value Matching |
-| **Test Harness** | Verification | verify-detection.sh script |
+I den katalogen finns `docker-compose.yml`, Suricata-logs och de faktiska containrarna.
 
-## 🚀 Quick Start Sequence
+## 📁 Denna mapps innehåll
 
-### Step 1: Prepare Environment
+- `README.md` — Översikt över Del 3 och arbetsflödet
+- `EXECUTION-GUIDE.md` — Steg för steg instruktioner
+- `CUSTOM-RULES.md` — Exempel på egna Suricata-regler
+- `START-HERE.md` — Status och snabbstart
+- `detection.md` — Dokumentationstemplate för resultat
+- `verify-output.txt` — Resultat från verifiering (ska genereras)
+- `fast.log` — Kopierad Suricata alert-logg
+- `ot.rules` — Kopierad regeluppsättning
+- `alert-anatomy.json` — JSON-alert-exempel
+
+## 🎯 Målet
+
+Del 3 ska visa att Suricata kan detektera Modbus-baserade attacker i OT-nätverket.
+Fokus är på:
+- Basreglerna: FC5, FC6, FC16, TCP sessioner
+- Egna regler: FC8 Diagnostik + värdebaserad Setpoint-detektion
+- Dokumentation av resultat i `detection.md`
+
+## 🚀 Snabbstart
+
 ```bash
-# Stop Del 2 sandbox if running
+# Stäng ner Del 2 om den körs
 cd ~/ais-lab2-sandboxes/del2
 docker compose down
 
-# Navigate to Del 3
+# Starta Del 3-sandboxen
 cd ~/ais-lab2-sandboxes/del3
-mkdir -p suricata-logs
-```
-
-### Step 2: Start Del 3 Sandbox (6 containers)
-```bash
-# Build and start (first time: ~1-2 min for pip install)
 docker compose up -d --build
 
-# Verify all 6 containers running
 docker compose ps
 ```
 
-**Expected Containers:**
-- `lab3-mock-plc` — Real pymodbus PLC (port 502)
-- `lab3-hmi` — HMI poller (FC3 every 1s)
-- `lab3-attacker` — Attack simulation container
-- `lab3-jump` — Jump-server with attack scripts
-- `lab3-historian` — SCADA historian
-- `lab3-suricata` — Suricata IDS (monitoring)
+## 🔎 Kontrollera sandboxen
 
-### Step 3: Verify HMI-PLC Communication
+Förväntade containrar i `~/ais-lab2-sandboxes/del3`:
+- `lab3-mock-plc`
+- `lab3-hmi`
+- `lab3-attacker`
+- `lab3-jump`
+- `lab3-historian`
+- `lab3-suricata`
+
+Kontrollera att Suricata-loggar finns i:
+- `suricata-logs/fast.log`
+- `suricata-logs/eve.json`
+
+## 🧪 Verifiering
+
+Kör verifieringen i den externa sandboxen:
+
 ```bash
-# Watch HMI polling the PLC
-docker logs -f lab3-hmi
-# Should show: [HMI] SP=5000 TL=3050 PS=80 CL=495
-# Ctrl+C to stop
-```
-
-### Step 4: Confirm Suricata is Monitoring
-```bash
-# Check Suricata startup logs
-docker logs lab3-suricata 2>&1 | tail -20
-
-# Look for:
-# - "4 rules successfully loaded"
-# - "3 inspect application layer"
-# - "br-lab3-ot: creating 2 threads"
-# - "Engine started"
-```
-
-### Step 5: Run Detection Verification
-```bash
-# Run automated test
-./verify-detection.sh
-
-# Save output
+cd ~/ais-lab2-sandboxes/del3
 ./verify-detection.sh | tee ~/ais-lab2/del3/verify-output.txt
 ```
 
-### Step 6: Create Custom Rules
-Edit `rules/ot.rules` and add two new rules:
+Kopiera sedan `verify-output.txt` till denna repo-mapp.
 
-**Rule A: FC8 Diagnostics (DoS)**
-```
-alert modbus any any -> $OT_NET 502 ( \
-    msg:"OT-DIAG: Modbus Diagnostics (FC8) — potential DoS"; \
-    flow:to_server,established; \
-    modbus: function 8; \
-    classtype:attempted-dos; \
-    sid:1000100; rev:1; priority:1; \
-)
-```
+## ⚙️ Egna regler
 
-**Rule B: Unsafe Setpoint Value**
-```
-alert modbus any any -> $OT_NET 502 ( \
-    msg:"OT-WRITE-CRITICAL: Setpoint > 8000 (unsafe range)"; \
-    flow:to_server,established; \
-    modbus: function 6, address 0, value >8000; \
-    classtype:attempted-admin; \
-    sid:1000101; rev:1; priority:1; \
-)
-```
+Lägg till egna regler i sandboxens `rules/ot.rules`.
+Rekommenderade tillägg:
+- FC8 Diagnostik (DoS-indikator)
+- Värdebaserad alarmregel för Setpoint > 8000
 
-### Step 7: Collect Evidence
-```bash
-# Copy Suricata logs to repo
-cp ~/ais-lab2-sandboxes/del3/suricata-logs/fast.log ~/ais-lab2/del3/
-cp ~/ais-lab2-sandboxes/del3/rules/ot.rules ~/ais-lab2/del3/
+## ✔️ Dokumentation
 
-# Extract alert JSON (VG-bonus)
-cd ~/ais-lab2-sandboxes/del3
-jq 'select(.event_type=="alert") | {ts:.timestamp, sig:.alert.signature, sid:.alert.signature_id, src:.src_ip, dst:.dest_ip, modbus:.modbus}' \
-  suricata-logs/eve.json | head -30 > ~/ais-lab2/del3/alert-anatomy.json
-```
+Fyll i `del3/detection.md` med:
+- Sammanfattning
+- Detektionsarkitektur
+- Regeluppsättning
+- Verifieringsresultat
+- Förslag på förbättringar
 
-### Step 8: Document Findings
-Write `del3/detection.md` using the template provided below.
+## 📌 Viktigt att veta
 
----
+- `del3`-mappen i detta repository är dokumentationsmapp. Den körbara sandboxen finns i `~/ais-lab2-sandboxes/del3`.
+- Kopiera resultatfiler till denna mapp innan inlämning.
+- Om du behöver byta port eller nätverksinställningar, gör det i den externa sandboxens `docker-compose.yml`.
 
-## 📁 Files You'll Create in del3/
+## ✅ Leveranskriterier
 
-```
-del3/
-├── detection.md              ← Design documentation
-├── verify-output.txt         ← verify-detection.sh results
-├── fast.log                  ← Suricata alerts (copied)
-├── ot.rules                  ← Your custom rules (copied)
-├── alert-anatomy.json        ← Example alert JSON (VG-bonus)
-└── [screenshots/]            ← Screenshots of alerts
-    └── fast-log-attacks.png
-```
+Del 3 är klar när följande finns i detta repo:
+- `verify-output.txt`
+- `fast.log`
+- `ot.rules`
+- `detection.md`
+- `alert-anatomy.json` (rekommenderat)
 
----
+## 🎓 Slutsats
 
-## 🔍 Understanding Suricata Rules
+Den viktigaste poängen är att Suricata ska fånga Modbus-skrivkommandon och sessionstart, och att dokumentera det i `detection.md`.
 
-### Rule Anatomy (Example: FC6 Write Single Register)
-
-```
-alert modbus any any -> $OT_NET 502 ( \
-    msg:"OT-WRITE: Modbus Write Single Register (FC6)"; \
-    flow:to_server,established; \
-    modbus: function 6; \
-    classtype:attempted-admin; \
-    sid:2000006; rev:1; \
-)
-```
-
-| Part | Meaning |
-|------|---------|
-| `alert` | Action (alert/drop/log/pass) |
-| `modbus` | Protocol to inspect |
-| `any any` | From any IP:port |
-| `-> $OT_NET 502` | To OT network on port 502 |
-| `msg:...` | Human-readable description |
-| `flow:to_server,established` | Only match client→server in established sessions |
-| `modbus: function 6` | Trigger on Modbus function code 6 |
-| `classtype:attempted-admin` | Category for alert |
-| `sid:2000006` | Signature ID (unique identifier) |
-
-### Why We Alert on ALL Writes
-
-In this environment:
-- ✅ Legitimate traffic: HMI polling with **FC3 (reads only)**
-- ❌ Illegitimate traffic: **Any write command (FC5/FC6/FC16)**
-
-→ Therefore: **Every write is per definition suspicious**
-
-In production, you'd maintain an allowlist of authorized writers and only alert on exceptions.
-
----
-
-## 🎯 The Four Base Rules (Already Provided)
-
-| SID | Function | Command | Severity | Why? |
-|-----|----------|---------|----------|------|
-| 2001000 | TCP SYN | New connection to :502 | Medium | Detect reconnaissance |
-| 2000005 | FC5 | Force Single Coil | High | Disruptive write |
-| 2000006 | FC6 | Write Single Register | High | Setpoint manipulation |
-| 2000016 | FC16 | Write Multiple Registers | Critical | Bulk write attack |
-
----
-
-## 🧪 Testing Your Setup
-
-### Manual Test: Attack FC6
-```bash
-# Terminal 1: Watch alerts
-tail -F ~/ais-lab2-sandboxes/del3/suricata-logs/fast.log
-
-# Terminal 2: Trigger attack
-docker exec lab3-jump python3 /scripts/attack-fc6.py 9999
-
-# Expected: Two alerts in Terminal 1
-# - SID 2001000: New TCP session
-# - SID 2000006: FC6 write detected
-```
-
-### Full Test Suite
-```bash
-cd ~/ais-lab2-sandboxes/del3
-./verify-detection.sh
-
-# Expected output:
-#  ✓ FIRED  FC6  Write Single Register           sid:2000006
-#  ✓ FIRED  FC5  Force Single Coil               sid:2000005
-#  ✓ FIRED  FC16 Write Multiple Registers        sid:2000016
-#  ✓ FIRED  New Modbus TCP session               sid:2001000
-```
-
----
-
-## 📝 Template: detection.md
-
-Save this as `del3/detection.md`:
-
-```markdown
-# Lab 2 — Del 3: Intrusion Detection with Suricata
-
-## Sammanfattning
-Suricata IDS deployed on OT network bridge. Monitors all Modbus traffic
-and alerts on writes (FC5/FC6/FC16) and session initiation. Added two
-custom rules: FC8 Diagnostics detection + unsafe setpoint value matching.
-
-## Detection Architecture
-- **Sensor Placement:** Suricata sniffing br-lab3-ot (OT bridge)
-- **Protocol Coverage:** Modbus/TCP application layer (port 502)
-- **Baseline Traffic:** HMI polling every 1 second (FC3 read only)
-- **Attack Surface:** Any write command = anomaly
-
-## Rule Set
-
-### Base Rules (Provided)
-| SID | Type | Message | Detection |
-|-----|------|---------|-----------|
-| 2001000 | TCP | New Modbus session | Reconnaissance |
-| 2000005 | FC5 | Force Single Coil | Disruptive write |
-| 2000006 | FC6 | Write Single Register | Setpoint manipulation |
-| 2000016 | FC16 | Write Multiple Registers | Bulk write |
-
-### Custom Rules (Added by Me)
-| SID | Type | Message | Detection |
-|-----|------|---------|-----------|
-| 1000100 | FC8 | Diagnostics — potential DoS | Denial of service |
-| 1000101 | FC6+Value | Unsafe setpoint (>8000) | Out-of-range safety |
-
-## Detection Results
-
-All attacks successfully detected:
-- ✓ FC6 write attack (Setpoint manipulation) — SID 2000006
-- ✓ FC5 attack (Force coil) — SID 2000005
-- ✓ FC16 attack (Multiple register write) — SID 2000016
-- ✓ TCP session initiation — SID 2001000
 
 Evidence: `del3/verify-output.txt`, `del3/fast.log`
 

@@ -1,3 +1,0 @@
-# Placeholder: populate this file with attacker commands from jump-server history once the incident is executed.
-# Example command to run:
-# docker exec lab3-jump cat /root/.ash_history > del4/evidence/jump-history.txt

@@ -1,10 +1,77 @@
-{
-  "description": "Placeholder OT network topology evidence. Replace with captured OT network map, host IPs, VLANs, and firewall rule mappings.",
-  "hosts": [
+[
     {
-      "name": "lab3-ot-bridge",
-      "ip": "172.31.50.1",
-      "role": "OT border bridge"
+        "Name": "del3_ot",
+        "Id": "db06970cd4d096e87b736290cda733550a37b91e267afb6645d14f951808b9ae",
+        "Created": "2026-05-26T15:18:32.444984746Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.31.50.0/24",
+                    "Gateway": "172.31.50.1"
+                }
+            ]
+        },
+        "Internal": true,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {
+            "com.docker.network.bridge.name": "br-lab3-ot"
+        },
+        "Labels": {
+            "com.docker.compose.config-hash": "90eb69cf250304809697f63f2b7b1e9c3bba8b38e4c5bcaa578c2993a4226c4c",
+            "com.docker.compose.network": "ot",
+            "com.docker.compose.project": "del3",
+            "com.docker.compose.version": "2.40.3"
+        },
+        "Containers": {
+            "689d6ae947099058a59b82254e61037bd4ae67976ee5c67e58617e671452c9bf": {
+                "Name": "lab3-jump",
+                "EndpointID": "6f0cdee04cc6569d7c8220db4a2c7848b7607dd616af81f51d70480c35d725d0",
+                "MacAddress": "f6:82:b2:23:98:aa",
+                "IPv4Address": "172.31.50.99/24",
+                "IPv6Address": ""
+            },
+            "75904655fa4c9fa862dd9df8b31090cb6baff76b9237be217e5bceadebed2832": {
+                "Name": "lab3-plc",
+                "EndpointID": "d310bc82e3d9c9644304de7c78ce48a011fce391c583b57060d5c0fee9d43277",
+                "MacAddress": "de:51:b8:6b:d1:60",
+                "IPv4Address": "172.31.50.10/24",
+                "IPv6Address": ""
+            },
+            "7fa5976561c5221867be9cd42c5eaf657d0a55f2995cec37770e401cb4ce1c8a": {
+                "Name": "lab3-historian",
+                "EndpointID": "d4042feb70d810807be8905862cc63a28f490f02b2cfbfa40a63fcf00512708a",
+                "MacAddress": "9e:25:d1:52:ec:2a",
+                "IPv4Address": "172.31.50.30/24",
+                "IPv6Address": ""
+            },
+            "8aa99c041d65b93799c900f246c6a3bfe1c73a7dd7eb4e45e82076fbbffcf185": {
+                "Name": "lab3-hmi",
+                "EndpointID": "655b30c90a242e7d5a6614674155a7f14ad271c4c74003cc310beb784f329924",
+                "MacAddress": "22:20:bf:01:da:4a",
+                "IPv4Address": "172.31.50.20/24",
+                "IPv6Address": ""
+            }
+        },
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "172.31.50.0/24": {
+                        "IPsInUse": 7,
+                        "DynamicIPsAvailable": 249
+                    }
+                }
+            }
+        }
     }
-  ]
-}
+]

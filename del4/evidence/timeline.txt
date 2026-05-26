@@ -1,5 +1,7 @@
-# Placeholder: fill in timeline events from the incident response workflow.
-# Example:
-# 06:48:35 - Suricata alert detected Modbus session from 172.31.50.20 to 172.31.50.10:502
-# 06:50:00 - Verified OT zone segmentation and blocked attacker host
-# 06:55:10 - Collected evidence artifacts
+05/26/2026-06:48:35.563375  [**] [1:2001000:1] OT-SESSION: New Modbus TCP session [**] [Classification: Attempted Information Leak] [Priority: 2] {TCP} 172.31.50.20:48500 -> 172.31.50.10:502
+05/26/2026-15:02:20.907891  [**] [1:2001000:1] OT-SESSION: New Modbus TCP session [**] [Classification: Attempted Information Leak] [Priority: 2] {TCP} 172.31.50.20:41352 -> 172.31.50.10:502
+05/26/2026-15:02:21.909236  [**] [1:2001000:1] OT-SESSION: New Modbus TCP session [**] [Classification: Attempted Information Leak] [Priority: 2] {TCP} 172.31.50.20:41366 -> 172.31.50.10:502
+05/26/2026-15:04:28.209175  [**] [1:2001000:1] OT-SESSION: New Modbus TCP session [**] [Classification: Attempted Information Leak] [Priority: 2] {TCP} 172.31.50.20:48628 -> 172.31.50.10:502
+05/26/2026-15:04:29.211608  [**] [1:2001000:1] OT-SESSION: New Modbus TCP session [**] [Classification: Attempted Information Leak] [Priority: 2] {TCP} 172.31.50.20:48642 -> 172.31.50.10:502
+05/26/2026-15:16:00.594825  [**] [1:2001000:1] OT-SESSION: New Modbus TCP session [**] [Classification: Attempted Information Leak] [Priority: 2] {TCP} 172.31.50.20:35494 -> 172.31.50.10:502
+05/26/2026-15:18:34.878644  [**] [1:2001000:1] OT-SESSION: New Modbus TCP session [**] [Classification: Attempted Information Leak] [Priority: 2] {TCP} 172.31.50.20:48222 -> 172.31.50.10:502

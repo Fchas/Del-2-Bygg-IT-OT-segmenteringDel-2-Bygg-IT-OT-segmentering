@@ -18,15 +18,18 @@ This folder is reserved for the incident evidence artifacts generated during Del
    EVIDENCE=~/ais-lab2/del4/evidence-$(date -u +%Y%m%dT%H%M%SZ)
    mkdir -p "$EVIDENCE"
    ```
-2. Copy Suricata logs:
+2. Copy Suricata logs from the Del 3 sandbox:
    ```bash
-   cp ~/ais-lab2-sandboxes/del3/suricata-logs/fast.log "$EVIDENCE/"
-   cp ~/ais-lab2-sandboxes/del3/suricata-logs/eve.json "$EVIDENCE/"
+   SANDBOX_DIR=/home/codespace/ais-lab2-sandboxes/del3
+   cp "$SANDBOX_DIR/suricata-logs/fast.log" "$EVIDENCE/"
+   cp "$SANDBOX_DIR/suricata-logs/eve.json" "$EVIDENCE/"
    ```
 3. Save network and service state:
    ```bash
-   docker network inspect lab2-del3-sandbox_ot > "$EVIDENCE/ot-network.json"
-   docker compose -f ~/ais-lab2-sandboxes/del3/docker-compose.yml ps > "$EVIDENCE/compose-state.txt"
+   SANDBOX_DIR=/home/codespace/ais-lab2-sandboxes/del3
+   OT_NETWORK=del3_ot
+   docker compose -f "$SANDBOX_DIR/docker-compose.yml" ps > "$EVIDENCE/compose-state.txt"
+   docker network inspect "$OT_NETWORK" > "$EVIDENCE/ot-network.json"
    ```
 4. Save jump-server memory and commands:
    ```bash
@@ -39,9 +42,31 @@ This folder is reserved for the incident evidence artifacts generated during Del
    ```
 6. Create a timeline extract:
    ```bash
-   grep -E "OT-|Modbus" ~/ais-lab2-sandboxes/del3/suricata-logs/fast.log | head -50 > "$EVIDENCE/timeline.txt"
+   grep -E "OT-|Modbus" "$SANDBOX_DIR/suricata-logs/fast.log" | head -50 > "$EVIDENCE/timeline.txt"
    ```
 
+## Automation script
+You can automate evidence collection using `del4/collect-evidence.sh`.
+
+```bash
+cd /workspaces/Del-2-Bygg-IT-OT-segmenteringDel-2-Bygg-IT-OT-segmentering/del4
+chmod +x collect-evidence.sh
+./collect-evidence.sh
+```
+
+If your sandbox is not in the default location, set `SANDBOX_DIR` first:
+
+```bash
+SANDBOX_DIR=/home/codespace/ais-lab2-sandboxes/del3 ./collect-evidence.sh
+```
+
+If your Docker network name differs from the default `del3_ot`, set `OT_NETWORK` as well:
+
+```bash
+SANDBOX_DIR=/home/codespace/ais-lab2-sandboxes/del3 OT_NETWORK=del3_ot ./collect-evidence.sh
+```
+
 ## Notes
-- If the incident has not yet been executed, this guide prepares the evidence workflow.
+- The Del 3 sandbox runtime is expected under `~/ais-lab2-sandboxes/del3`; the `del3/` folder in this repository contains lab documentation only.
+- If the sandbox fails to start because host port `2222` is already in use by local SSH, update the sandbox compose file to use a different host port (for example `127.0.0.1:2223:22`) or remove the host port mapping if you only need `docker exec lab3-jump`.
 - After completion, copy the generated files into this repository under `del4/evidence/`.

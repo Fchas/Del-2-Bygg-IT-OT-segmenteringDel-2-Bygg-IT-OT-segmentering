@@ -1,31 +1,66 @@
 # Lab 2 Del 4: Incident Response in OT
 
 **Status:** Draft ready
-**Target:** ICS-CERT incident report and Del 4 evidence collection
+**Target:** ICS-CERT incident report and evidence collection
 
 ## Purpose
-This folder contains the Del 4 incident response artifacts and a guided workflow for executing the attack, triage, containment, evidence collection, recovery, and lessons steps.
+Denna mapp innehåller Del 4-material för incidentrespons i OT.
+Den faktiska Del 3-sandboxen körs i en extern katalog:
 
-## What to do next
-1. Start the Del 3 sandbox:
+`~/ais-lab2-sandboxes/del3`
+
+## Vad som ska göras
+1. Starta den externa Del 3-sandboxen:
    - `cd ~/ais-lab2-sandboxes/del3`
    - `docker compose up -d --build`
-2. Capture baseline state before the attack:
-   - HMI output from `docker logs -f lab3-hmi`
-   - Suricata `fast.log` should be empty or contain only benign baseline traffic
-   - Save a screenshot as `screenshots/baseline.png`
-3. Run the attack from the jump server:
-   - `docker exec lab3-jump nmap -p 502 --open 172.31.50.0/24`
-   - `docker exec lab3-jump python3 /scripts/attack-fc16.py`
-   - `docker exec lab3-jump python3 /scripts/attack-fc6.py 5500`
-   - Record the UTC timestamp with `date -u '+%Y-%m-%dT%H:%M:%SZ'`
-4. Switch to IR mode and perform triage, containment, evidence collection, recovery, and eradication as documented in `del4/incident-report.md`.
+2. Observa baselineförhållanden:
+   - `docker logs -f lab3-hmi`
+   - `fast.log` bör visa normalt eller begränsat trafikmönster
+   - Spara helst en screenshot i `screenshots/`
+3. Kör attack och triangulering enligt labbens instruktioner.
+4. Samla in bevis med skriptet i denna mapp:
+   - `SANDBOX_DIR=/home/codespace/ais-lab2-sandboxes/del3 ./collect-evidence.sh`
+5. Uppdatera `incident-report.md` med faktiska tidsstämplar, attacker och containmentsåtgärder.
 
-## Files in this folder
-- `incident-report.md` — Draft ICS-CERT incident report
-- `reflection.md` — OT security reflection (400–600 words)
-- `evidence/README.md` — Evidence collection instructions and artifact guide
+## Filinnehåll
+- `collect-evidence.sh` — Automatiserat skript för att hämta artefakter från Del 3-sandboxen
+- `incident-report.md` — ICS-CERT-rapport för incidenten
+- `reflection.md` — Reflektion över OT-säkerhet och labbens lärdomar
+- `evidence/README.md` — Guide till artefaktsinsamling
 
-## Notes
-- The report is prepared from the Del 4 workflow and should be updated with exact timestamps, signatures, and attacker IPs after the live execution.
-- The evidence folder contains an artifact collection plan; populate it with the actual files once the incident is executed.
+## Hur du samlar bevis
+Kör följande i `del4`:
+
+```bash
+cd /workspaces/Del-2-Bygg-IT-OT-segmenteringDel-2-Bygg-IT-OT-segmentering/del4
+SANDBOX_DIR=/home/codespace/ais-lab2-sandboxes/del3 ./collect-evidence.sh
+```
+
+Om OT-nätverksnamnet skiljer sig från standarden `del3_ot`, använd också:
+
+```bash
+SANDBOX_DIR=/home/codespace/ais-lab2-sandboxes/del3 OT_NETWORK=del3_ot ./collect-evidence.sh
+```
+
+## Förväntade artefakter
+- `del4/evidence/fast.log`
+- `del4/evidence/eve.json`
+- `del4/evidence/timeline.txt`
+- `del4/evidence/ot-network.json`
+- `del4/evidence/compose-state.txt`
+- `del4/evidence/jump-history.txt`
+- `del4/evidence/jump-processes.txt`
+- `del4/evidence/plc-state.txt`
+
+## Viktigt att notera
+- `jump-history.txt` eller `plc-state.txt` kan vara tomma om informationen inte är tillgänglig i sandlådan.
+- Om `127.0.0.1:2222` är upptaget på hosten, använd en annan port i sandboxens `docker-compose.yml`, t.ex. `127.0.0.1:2223:22`.
+- Rapporten i `incident-report.md` ska baseras på de faktiska artefakterna i `del4/evidence/`.
+
+## Slutsats
+Del 4 är klar när:
+- evidensfiler finns i `del4/evidence/`
+- `incident-report.md` uppdaterats med faktiska bevis och tider
+- `reflection.md` beskriver skillnaderna mellan IT- och OT-incidenthantering
+
+**Status:** Klart för validering efter insamling och rapportuppdatering.
