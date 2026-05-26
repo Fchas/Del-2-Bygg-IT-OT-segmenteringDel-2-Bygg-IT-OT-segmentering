@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  attacker:
+    image: alpine:3.20
+    container_name: lab2-attacker
+    hostname: attacker
+    command: >
+      sh -c "apk add --no-cache nmap curl >/dev/null && sleep infinity"
+    networks:
+      it:
+
+  jump-server:
+    image: alpine:3.20
+    container_name: lab2-jump
+    hostname: jump-server
+    command: >
+      sh -c "apk add --no-cache openssh-server openssh-client >/dev/null && sleep infinity"
+    networks:
+      it:
+      ot:
+
+  historian:
+    image: alpine:3.20
+    container_name: lab2-historian
+    hostname: historian
+    command: >
+      sh -c "apk add --no-cache curl >/dev/null && sleep infinity"
+    networks:
+      dmz:
+      ot:
+
+  mock-plc:
+    image: alpine:3.20
+    container_name: lab2-plc
+    hostname: mock-plc
+    command: >
+      sh -c "apk add --no-cache nc >/dev/null && nc -l -p 502"
+    networks:
+      ot:
+
+networks:
+  it:
+    name: lab2-del2-sandbox_it
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.10.0/24
+
+  dmz:
+    name: lab2-del2-sandbox_dmz
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.20.0/24
+
+  ot:
+    name: lab2-del2-sandbox_ot
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.50.0/24

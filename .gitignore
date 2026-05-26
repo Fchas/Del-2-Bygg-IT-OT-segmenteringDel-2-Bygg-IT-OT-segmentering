@@ -1,0 +1,37 @@
+lab2-modbus.pcap
+
+# Common secrets and credentials
+.env
+.env.*
+*.secret
+secrets.*
+credentials
+
+# Private keys and certificates
+*.pem
+*.key
+*.ppk
+*.p12
+*.jks
+*.crt
+*.csr
+*.pfx
+
+# SSH keys
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+.ssh/*id_*
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary and backup files
+*.bak
+*.tmp
+*.log
+*.sqlite3

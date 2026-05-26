@@ -1,0 +1,5 @@
+# Placeholder: fill in timeline events from the incident response workflow.
+# Example:
+# 06:48:35 - Suricata alert detected Modbus session from 172.31.50.20 to 172.31.50.10:502
+# 06:50:00 - Verified OT zone segmentation and blocked attacker host
+# 06:55:10 - Collected evidence artifacts

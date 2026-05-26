@@ -1,0 +1,4 @@
+# Placeholder: paste the docker-compose `ps` and `config` output for the Lab 3 sandbox here after the incident.
+# Example:
+# docker compose -f del3/docker-compose.yml ps
+# docker compose -f del3/docker-compose.yml config

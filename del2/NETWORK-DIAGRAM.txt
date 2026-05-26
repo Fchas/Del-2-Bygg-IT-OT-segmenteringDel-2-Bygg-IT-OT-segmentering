@@ -1,0 +1,163 @@
+# Lab 2 Del 2 - Network Segmentation Diagram
+
+## IT/OT Zone Segmentation with Bastion Pattern
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                                                           │
+│  ╔════════════════════════════════════════════════════════════════════╗ │
+│  ║                      IT ZONE (Level 4-5)                           ║ │
+│  ║                    Subnet: 172.30.10.0/24                          ║ │
+│  ║                                                                     ║ │
+│  ║    ┌─────────────────┐                                             ║ │
+│  ║    │    attacker     │  (Simulated threat from IT)                 ║ │
+│  ║    │ 172.30.10.x     │  - nmap, curl, network tools               ║ │
+│  ║    │ (alpine)        │  - CAN reach: jump-server:22 (allowed)      ║ │
+│  ║    └────────┬────────┘  - CANNOT reach: mock-plc (blocked)         ║ │
+│  ║             │                                                       ║ │
+│  ║             │ SSH port 22 ↓ [ALLOWED - bastion entry point]        ║ │
+│  ║             │                                                       ║ │
+│  ╚═════════════╪═══════════════════════════════════════════════════════╝ │
+│                │                                                          │
+│                │ Firewall boundary (Docker network isolation L2)          │
+│                │                                                          │
+│  ╔═════════════╪═══════════════════════════════════════════════════════╗ │
+│  ║             ↓                                                        ║ │
+│  ║  ┌──────────────────────┐                                           ║ │
+│  ║  │  jump-server (DMZ)   │  Bastion Host                             ║ │
+│  ║  │ IT: 172.30.10.y      │  - Single entry point from IT            ║ │
+│  ║  │ OT: 172.30.50.z      │  - Can be logged/audited/MFA             ║ │
+│  ║  │ (alpine + ssh)       │  - Logs all OT access attempts            ║ │
+│  ║  └────────┬─────────────┘                                           ║ │
+│  ║           │ Modbus :502 ↓ [ALLOWED]                                ║ │
+│  ║  DMZ-LEVEL SERVICES                                                 ║ │
+│  ║  ┌─────────────────────────────┐                                    ║ │
+│  ║  │   historian (SCADA)         │                                    ║ │
+│  ║  │ DMZ: 172.30.20.x            │  - Reads production data from OT   ║ │
+│  ║  │ OT:  172.30.50.a            │  - Can reach internet (NTP, patch) ║ │
+│  ║  │ (alpine)                    │  - CAN reach: mock-plc:502         ║ │
+│  ║  └────────┬────────────────────┘                                    ║ │
+│  ║           │ Modbus :502 ↓ [ALLOWED]                                ║ │
+│  ╚═══════════╪════════════════════════════════════════════════════════╝ │
+│              │ Firewall boundary (Docker network isolation L2)           │
+│              │                                                           │
+│  ╔═══════════╪════════════════════════════════════════════════════════╗ │
+│  ║           ↓                                                         ║ │
+│  ║  ╔═══════════════════════════════════════════════════════════════╗ ║ │
+│  ║  ║              OT ZONE (Level 0-3)                             ║ ║ │
+│  ║  ║             Subnet: 172.30.50.0/24                           ║ ║ │
+│  ║  ║             (ISOLATED FROM INTERNET)                          ║ ║ │
+│  ║  ║                                                               ║ ║ │
+│  ║  ║    ┌──────────────────────┐                                  ║ ║ │
+│  ║  ║    │    mock-plc          │  Industrial Control System       ║ ║ │
+│  ║  ║    │ 172.30.50.b          │  - Modbus/TCP port 502          ║ ║ │
+│  ║  ║    │ (alpine + nc listen) │  - CAN be reached from: bastion ║ ║ │
+│  ║  ║    │                      │  - CANNOT reach internet         ║ ║ │
+│  ║  ║    └──────────────────────┘  - CANNOT reach IT directly    ║ ║ │
+│  ║  ║                                                               ║ ║ │
+│  ║  ║    ✗ Internet (1.1.1.1:53) — BLOCKED [No route out]         ║ ║ │
+│  ║  ║                                                               ║ ║ │
+│  ║  ╚═══════════════════════════════════════════════════════════════╝ ║ │
+│  ║                                                                    ║ │
+│  ╚════════════════════════════════════════════════════════════════════╝ │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+## Network Rules Summary
+
+### ❌ BLOCKED (Illegitimate) Flows
+```
+attacker (IT) ──✗── mock-plc (OT)
+  └─ Why: Docker network isolation — attacker not on OT network
+  
+mock-plc (OT) ──✗── Internet (1.1.1.1:53)
+  └─ Why: Docker network isolation — OT not on internet-accessible network
+```
+
+### ✅ ALLOWED (Legitimate) Flows
+```
+attacker (IT) ──→ jump-server:22 (DMZ/Bastion)
+  └─ Why: Both share IT network; bastion entry point
+  
+jump-server (DMZ) ──→ mock-plc:502 (OT)
+  └─ Why: Bastion has OT network interface; authorized gateway
+  
+historian (DMZ) ──→ mock-plc:502 (OT)
+  └─ Why: Both share OT network; data historian reads from PLC
+  
+historian (DMZ) ──→ Internet (1.1.1.1:53)
+  └─ Why: Historian on DMZ with Internet connectivity for NTP/updates
+```
+
+## Docker Compose Network Configuration
+
+```yaml
+networks:
+  it:
+    subnet: 172.30.10.0/24  # IT systems, clients
+  dmz:
+    subnet: 172.30.20.0/24  # DMZ services (historian, patch-server)
+  ot:
+    subnet: 172.30.50.0/24  # OT systems, industrial
+
+services:
+  attacker:           # Threat actor in IT zone
+    networks:
+      - it            # ✓ Can be here
+                      # ✗ CANNOT be on OT (this was the bug)
+  
+  jump-server:        # Bastion / gateway
+    networks:
+      - it            # ✓ Reachable from IT clients
+      - ot            # ✓ Can reach OT systems
+  
+  historian:          # SCADA data historian
+    networks:
+      - dmz           # ✓ Logically in DMZ
+      - ot            # ✓ Reads from PLC (OT)
+  
+  mock-plc:           # Industrial PLC (goal)
+    networks:
+      - ot            # ✓ Only on OT
+```
+
+## Purdue Model Mapping
+
+```
+┌─────────────────────────────────────────┐
+│      Purdue Level 4-5 (Enterprise)      │
+│      ↓↑ [Jump-server gateway]           │
+│      Purdue Level 3.5 (DMZ)             │
+│      ↓↑ [Conduit via bastion]           │
+│  ┌─────────────────────────────────┐    │
+│  │ Purdue Levels 0-3 (OT/Industrial)   │
+│  │ (Isolated air-gapped concept)       │
+│  └─────────────────────────────────┘    │
+└─────────────────────────────────────────┘
+```
+
+## Key Security Properties
+
+| Property | Before Fix | After Fix |
+|----------|-----------|-----------|
+| Direct IT→OT | ✗ ALLOWED | ✓ BLOCKED |
+| Bastion access | ✓ ALLOWED | ✓ ALLOWED |
+| OT isolation | ✗ PARTIAL | ✓ COMPLETE |
+| Audit capability | (none) | Per-bastion |
+| Zone concept | Broken | Enforced by L2 isolation |
+
+## Testing Verification
+
+All 6 test cases from `verify.sh`:
+- ✓ attacker (IT) → mock-plc:502 = BLOCKED (fixed)
+- ✓ mock-plc (OT) → internet = BLOCKED (was always OK)
+- ✓ attacker (IT) → jump-server:22 = ALLOWED (bastion)
+- ✓ jump-server → mock-plc:502 = ALLOWED (bastion→OT)
+- ✓ historian → mock-plc:502 = ALLOWED (data read)
+- ✓ historian → internet = ALLOWED (DMZ can reach internet)
+
+---
+
+**Diagram created for Lab 2 Del 2 — Approved Level**
+Created: May 26, 2026

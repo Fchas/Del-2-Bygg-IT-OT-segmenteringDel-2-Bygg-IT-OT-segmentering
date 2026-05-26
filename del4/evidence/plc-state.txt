@@ -1,0 +1,4 @@
+# Placeholder: record PLC register state or screenshot text from the OT historian or Modbus device after containment.
+# Example contents:
+# Holding register 0: 0x1388
+# Holding register 1: 0x1388

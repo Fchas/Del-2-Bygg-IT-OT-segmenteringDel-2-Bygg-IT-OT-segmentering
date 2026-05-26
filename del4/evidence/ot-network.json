@@ -1,0 +1,10 @@
+{
+  "description": "Placeholder OT network topology evidence. Replace with captured OT network map, host IPs, VLANs, and firewall rule mappings.",
+  "hosts": [
+    {
+      "name": "lab3-ot-bridge",
+      "ip": "172.31.50.1",
+      "role": "OT border bridge"
+    }
+  ]
+}
