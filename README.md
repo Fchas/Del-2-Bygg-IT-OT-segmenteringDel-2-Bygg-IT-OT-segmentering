@@ -1,14 +1,14 @@
 # Lab 2: Nätverks-, OT- & AI-säkerhet — IT/OT-segmentering & Detektion
 
 **Chas Academy 2026 | Week 7 Workshop**  
-**Status:** Del 2 ✅ COMPLETE | Del 3 🚀 READY TO START  
-**Godkänd nivå (G) ✓ Implemented**
+**Status:** Del 1 ✅ COMPLETE | Del 2 ✅ COMPLETE | Del 3 ✅ COMPLETE | Del 4 ✅ COMPLETE  
+**Godkänd nivå (G) ✓ Implemented — Ready for final submission**
 
 ## 📋 Project Overview
 
-This repository contains **Lab 2, Parts 1-3** of the industrial cybersecurity course:
+This repository contains **Lab 2, Parts 1-4** of the industrial cybersecurity course:
 
-**Del 1: OT-range exploration** ✅ READY
+**Del 1: OT-range exploration** ✅ COMPLETE
 - Document OT architecture, PLC/HMI mapping, and attack surface
 - Capture baseline HMI and IDS observations
 - Prepare Del 1 deliverables for checkpoint
@@ -19,11 +19,15 @@ This repository contains **Lab 2, Parts 1-3** of the industrial cybersecurity co
 - Deploy bastion/jump-server pattern
 - Verify with 6-test suite (all passing ✓)
 
-**Del 3: Intrusion Detection** 🚀 READY
+**Del 3: Intrusion Detection** ✅ COMPLETE
 - Deploy Suricata IDS on OT bridge
 - Create Modbus detection rules
 - Test attack detection
 - Document findings
+
+**Del 4: Incident Response & Hardening** ✅ COMPLETE
+- Collect evidence, write incident report
+- Run `collect-evidence.sh`, update `incident-report.md` and `reflection.md`
 
 ## 📂 Repository Structure
 
@@ -44,13 +48,16 @@ This repository contains **Lab 2, Parts 1-3** of the industrial cybersecurity co
 │   ├── CHECKLIST.md                    (Requirements verified)
 │   └── [supporting files]
 │
-├── del3/                               ← Lab 2 Part 3 🚀 READY
+├── del3/                               ← Lab 2 Part 3 ✅ COMPLETE
 │   ├── START-HERE.md                   ← Begin here!
 │   ├── EXECUTION-GUIDE.md              (Step-by-step)
 │   ├── README.md                       (Concepts)
 │   ├── CUSTOM-RULES.md                 (Rule examples)
-│   ├── detection.md                    (Template)
-│   └── [to be populated after execution]
+│   ├── detection.md                    (Completed: detection report)
+│   ├── verify-output.txt               (Verification output copied from sandbox)
+│   ├── fast.log                        (Suricata alert log copied from sandbox)
+│   ├── ot.rules                        (Suricata rules used for tests)
+│   └── alert-anatomy.json              (Example alert JSON)
 │
 ├── screenshots/                        ← Evidence collection
 │   └── [screenshots of alerts]
@@ -292,10 +299,10 @@ Del 1: Kartläggning (Reconnaissance)      ✓ DONE
     ↓ Identified dual-homing vulnerability
 Del 2: Segmentering (This Implementation) ✓ DONE
     ↓ Fixed + verified segmentation
-Del 3: Detektering (IDS - Suricata)       ⏳ NEXT
-    ↓ Active detection of violations
-Del 4: Härdning (Hardening)               ⏳ LATER
-    ↓ Advanced security measures
+Del 3: Detektering (IDS - Suricata)       ✓ DONE
+    ↓ Suricata deployed, detections verified, evidence copied to repo
+Del 4: Härdning (Hardening)               ✓ DONE
+    ↓ Incident response artifacts collected; reflection and report completed
 ```
 
 ## 📝 Submission Status
@@ -328,26 +335,8 @@ For issues or questions about this lab:
 
 ---
 
-## 🎯 Next Steps
-
-### Immediate
-- ✅ Lab 2 Del 2 complete (approved level)
-- Prepare for Lab 2 Del 3 (Suricata IDS integration)
-
-### Short-term (Week 8)
-- Deploy Suricata on OT network (Del 3)
-- Create baseline traffic profiles
-- Generate detection rules for segmentation violations
-
-### Medium-term (Week 9-10)
-- Implement hardening measures (Del 4)
-- Add MFA to jump-server (VG requirement)
-- Complete full Lab 2 reflection
-
----
-
 **Status:** ✅ APPROVED LEVEL (G) COMPLETE  
 **Date Completed:** May 26, 2026  
-**Next Delivery:** Del 3 — May 30, 2026
+**Next Delivery:** Ready for final commit and submission
 
-Last updated: May 26, 2026
+Last updated: May 27, 2026

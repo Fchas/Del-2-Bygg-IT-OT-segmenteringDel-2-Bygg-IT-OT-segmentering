@@ -1,7 +1,7 @@
 # Lab 2 Del 4: Incident Response in OT
 
-**Status:** Draft ready
-**Target:** ICS-CERT incident report and evidence collection
+**Status:** ✅ COMPLETE
+**Target:** ICS-CERT incident report and evidence collection (evidence collected)
 
 ## Purpose
 Denna mapp innehåller Del 4-material för incidentrespons i OT.
@@ -28,8 +28,10 @@ Den faktiska Del 3-sandboxen körs i en extern katalog:
 - `reflection.md` — Reflektion över OT-säkerhet och labbens lärdomar
 - `evidence/README.md` — Guide till artefaktsinsamling
 
-## Hur du samlar bevis
-Kör följande i `del4`:
+## Hur du samlar bevis / Var bevis finns
+Evidensfilerna har redan samlats in och ligger i `del4/evidence/`.
+
+Om du vill samla om eller reproducera insamlingen, kör följande i `del4`:
 
 ```bash
 cd /workspaces/Del-2-Bygg-IT-OT-segmenteringDel-2-Bygg-IT-OT-segmentering/del4
@@ -58,9 +60,6 @@ SANDBOX_DIR=/home/codespace/ais-lab2-sandboxes/del3 OT_NETWORK=del3_ot ./collect
 - Rapporten i `incident-report.md` ska baseras på de faktiska artefakterna i `del4/evidence/`.
 
 ## Slutsats
-Del 4 är klar när:
-- evidensfiler finns i `del4/evidence/`
-- `incident-report.md` uppdaterats med faktiska bevis och tider
-- `reflection.md` beskriver skillnaderna mellan IT- och OT-incidenthantering
+Del 4 är slutförd: evidens finns i `del4/evidence/`, `incident-report.md` och `reflection.md` är uppdaterade.
 
-**Status:** Klart för validering efter insamling och rapportuppdatering.
+**Status:** ✅ COMPLETE — evidens samlad och rapport uppdaterad.

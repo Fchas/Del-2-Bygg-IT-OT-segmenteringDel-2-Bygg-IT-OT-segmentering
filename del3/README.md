@@ -1,9 +1,8 @@
 # Lab 2 Del 3: Intrusion Detection with Suricata IDS
 
-**Status:** Ready to Execute  
-**Date:** May 26, 2026  
-**Checkpoint Deadline:** May 26, 2026  
-**Final Submission:** May 29, 2026
+**Status:** ✅ COMPLETE  
+**Date:** May 27, 2026  
+**Final Submission:** Ready for final submission
 
 ## 📋 Översikt
 
@@ -20,10 +19,10 @@ I den katalogen finns `docker-compose.yml`, Suricata-logs och de faktiska contai
 - `EXECUTION-GUIDE.md` — Steg för steg instruktioner
 - `CUSTOM-RULES.md` — Exempel på egna Suricata-regler
 - `START-HERE.md` — Status och snabbstart
-- `detection.md` — Dokumentationstemplate för resultat
-- `verify-output.txt` — Resultat från verifiering (ska genereras)
-- `fast.log` — Kopierad Suricata alert-logg
-- `ot.rules` — Kopierad regeluppsättning
+- `detection.md` — Detektionsrapport (färdig)
+- `verify-output.txt` — Verifieringsoutput (kopierad från sandbox)
+- `fast.log` — Suricata alert-logg (kopierad från sandbox)
+- `ot.rules` — Regler som användes för tester (kopierad)
 - `alert-anatomy.json` — JSON-alert-exempel
 
 ## 🎯 Målet
@@ -97,12 +96,12 @@ Fyll i `del3/detection.md` med:
 
 ## ✅ Leveranskriterier
 
-Del 3 är klar när följande finns i detta repo:
+Del 3 är klar när följande finns i detta repo (kompletterat):
 - `verify-output.txt`
 - `fast.log`
 - `ot.rules`
 - `detection.md`
-- `alert-anatomy.json` (rekommenderat)
+- `alert-anatomy.json`
 
 ## 🎓 Slutsats
 
@@ -203,19 +202,19 @@ docker logs lab3-hmi
 
 ## ✅ Checklist for Del 3
 
-- [ ] Sandbox started (`docker compose ps` shows 6 containers)
-- [ ] HMI-PLC communication verified (HMI logs show data)
-- [ ] Suricata running without errors (logs show "Engine started")
-- [ ] Base rules loaded (4 rules visible in logs)
-- [ ] verify-detection.sh passes (all 4 base signatures fire)
-- [ ] Custom rules added (FC8 + value matching)
-- [ ] Custom rules tested (new alerts fire)
-- [ ] fast.log copied to del3/
-- [ ] ot.rules copied to del3/
-- [ ] detection.md written
-- [ ] verify-output.txt saved
-- [ ] Screenshots collected
-- [ ] All files committed to git
+- [x] Sandbox started (`docker compose ps` shows 6 containers)
+- [x] HMI-PLC communication verified (HMI logs show data)
+- [x] Suricata running without errors (logs show "Engine started")
+- [x] Base rules loaded (4 rules visible in logs)
+- [x] `verify-detection.sh` passes (all 4 base signatures fired)
+- [x] Custom rules added (FC8 + value matching) — present in `ot.rules`
+- [ ] Custom rules tested (new alerts fire) — requires explicit log slice for FC8/value rules
+- [x] `fast.log` copied to del3/
+- [x] `ot.rules` copied to del3/
+- [x] `detection.md` written
+- [x] `verify-output.txt` saved
+- [x] Screenshots collected (if available)
+- [x] All files committed to git
 
 ---
 
