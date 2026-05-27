@@ -56,21 +56,26 @@ alert modbus any any -> $OT_NET 502 ( \
 
 ## Resultat av detektion
 
-### Verifierade attacker — alle detekterade ✓
+### Verifieringsresultat från `verify-output.txt`
+
+Körning av `./verify-detection.sh` i den externa sandboxen gav följande bevis:
 
 ```
  ✓ FIRED  FC6  Write Single Register                   sid:2000006
  ✓ FIRED  FC5  Force Single Coil                       sid:2000005
  ✓ FIRED  FC16 Write Multiple Registers                sid:2000016
  ✓ FIRED  New Modbus TCP session                       sid:2001000
- ✓ FIRED  FC8 Diagnostics — potential DoS              sid:1000100
- ✓ FIRED  Setpoint > 8000 (unsafe range)               sid:1000101
 ```
 
+Detta visar att de fyra basreglerna för Modbus-skrivattacker och sessioninitiering fungerar korrekt.
+
+Observera att `./verify-detection.sh` validerar de fyra levererade basreglerna (FC6, FC5, FC16 och TCP-session). De två egna reglerna för FC8 och värdebaserad setpoint-detektion är definierade i `ot.rules`, men kräver separat bevisning i `fast.log` eller `eve.json` för att bekräftas som testade.
+
 **Bevis:**
-- `del3/verify-output.txt` — verify-detection.sh resultat
-- `del3/fast.log` — Suricata-alarmen efter attacker
-- `screenshots/fast-log-attacks.png` — Visuell evidence
+- `del3/verify-output.txt` — verifieringsoutput från `./verify-detection.sh`
+- `del3/fast.log` — den faktiska Suricata-alarmloggen som bekräftar att varje detekterad attack genererade ett larm
+- `del3/ot.rules` — regelfilen som användes av Suricata för att matcha de upptäckta Modbus-paketen
+- `screenshots/fast-log-attacks.png` — visuell bevisning (om tillgänglig)
 
 ## Analys: Falskt positiva vs sanna positiva
 
@@ -197,6 +202,6 @@ När Suricata-larmen tänds i Del 3, kommer Del 4 att fokusera på:
 ---
 
 **Status:** ✅ Detektion operationell  
-**Regler testade:** 6 signaturer, alla eldande  
+**Regler testade:** 4 basregler, alla eldande  
 **Egna regler:** 2 (FC8 + värdekontroll)  
 **Slutförda:** 2026-05-26
